@@ -1,0 +1,44 @@
+name: CI # GitHub上に表示される Workflow の名前です
+
+on: # 実行される条件
+  push:
+    branches: [main] # main ブランチにプッシュされたら実行されます
+  pull_request:
+    branches: [main] # main ブランチにプルリクエストが送られたら実行されます
+
+jobs: # 実行される Workflow です。今回は build と lint を設定します
+  build:
+    needs: lint
+    runs-on: ubuntu-latest # 実行される環境を設定します
+
+    steps:
+      - name: Checkout repository # レポジトリの内容をコピーさせます
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js # Node.jsを設定します
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23'
+
+      - name: Install dependencies
+        run: npm ci # Clean install のコマンドです。npm install とほぼ同じです
+
+      - name: Build project
+        run: npm run build
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Linter 
+        run: npm run lint # Linter を実行します
